@@ -25,80 +25,20 @@ public class PlayerControls : MonoBehaviour
     }
 
 
-
     void FixedUpdate()
     {
         //grabs the input values
-        float xInput = Input.GetAxis("Horizontal");
         float yInput = Input.GetAxis("Vertical");
-
-        Vector3 inputDirection = new Vector3(xInput, 0, yInput); //this if statement insures you can't move faster in a diagonal direction
-
-        if (inputDirection.magnitude > 1.0f)
+        if (yInput != 0)
         {
-            inputDirection.Normalize();
+
+            float targetVelocity = yInput * speed; //this calculates what velocity we want to go
+
+            float velocityChange = targetVelocity - rbPlayer.linearVelocity.y; //this calculates the difference between how fast we want to go, and our current velocity
+
+            float velocityChangeClamped = Mathf.Clamp(velocityChange, -acceleration * Time.fixedDeltaTime, acceleration * Time.fixedDeltaTime);//this clamps the velocityChange so you can't accelerate too much between movements and potentially cancel out any physics interaction
+
+            rbPlayer.AddForce(new Vector3(0.0f, velocityChangeClamped * rbPlayer.mass, 0.0f), ForceMode.Impulse); //and this finally applies that force realitive to the objects mass
         }
-
-        //this is so that the direction is relitive to the direction the camera is facing(except it's forward tilit so that the xRotation of the camera doesn't affect the direction you go)
-        Vector3 camForward = tfCamera.forward;
-        Vector3 camRight = tfCamera.right;
-
-        Vector3 targetVelocity = (camForward * inputDirection.z + camRight * inputDirection.x) * speed; //this calculates what velocity we want to go
-
-        Vector3 velocityChange = targetVelocity - new Vector3(rbPlayer.linearVelocity.x, 0.0f, rbPlayer.linearVelocity.z); //this calculates the difference between how fast we want to go, and our current velocity
-
-        Vector3 velocityChangeClamped = Vector3.ClampMagnitude(velocityChange, acceleration * Time.fixedDeltaTime);//this clamps the velocityChange so you can't accelerate too much between movements and potentially cancel out any physics interaction
-
-        rbPlayer.AddForce(velocityChangeClamped * rbPlayer.mass, ForceMode.Impulse); //and this finally applies that force realitive to the objects mass
-
-        if (xInput != 0.0f || yInput != 0.0f) //this if/else statement just sets the animation correctly
-        {
-            animator.SetBool("Running", true);
-        }
-        else
-        {
-            animator.SetBool("Running", false);
-        }
-
-
-
-        //this if statement essitially says, if you are moving at all, change the rotation variable of the object(transform.rotation) to be the angle of both inputs(Mathf.Atan2(xInput,yInput) * Mathf.Rad2Deg) realitive to the direction of the camera's y rotation(tfCamera.up), offset by the current camera's rotation(tfCamera.eulerAngles.y)(offset because the direction the camera is pointed and the camera's current rotation are different things so you need both to make it point correctly)
-        if (xInput != 0 || yInput != 0)
-        {
-            transform.rotation = Quaternion.AngleAxis(Mathf.Atan2(xInput, yInput) * Mathf.Rad2Deg + tfCamera.eulerAngles.y, tfCamera.up);
-        }
-
-
-
-        if (Input.GetAxis("Jump") > 0.0f)// simple if statement setting the jump variable to true if you pressed jump
-        {
-            jump = true;
-        }
-
-
-        if (rbPlayer.linearVelocity.y >= -0.5f && rbPlayer.linearVelocity.y <= 0.5f) //this checks if you are at a vertical linearVelocity of about 0
-        {
-            Collider[] hitColliders = Physics.OverlapCapsule(transform.position, transform.position, 0.25f); //this grabs of list of collisions for this collider at the player's feet
-            foreach (Collider hit in hitColliders) //this goes through the list of collisions and if you are touching something tagged ground, sets isGrounded to true
-            {
-                if (hit.CompareTag("Ground"))
-                {
-                    isGrounded = true;
-                    break;
-                }
-            }
-        }
-        else //if you are not at a vertical velocity of about 0, you are definitly not on the ground so this sets the isGrounded tag to false
-        {
-            isGrounded = false;
-        }
-
-
-        if (isGrounded && jump) //this just jumps you if jump is true and isGrounded is true
-        {
-            rbPlayer.AddForce(new Vector3(0.0f, jumpHeight, 0.0f), ForceMode.Impulse);
-        }
-
-        jump = false; //sets jump to false because you either jumped or couldn't there for jump is an invalid input
     }
 }

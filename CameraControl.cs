@@ -28,6 +28,6 @@ public class CameraControl : MonoBehaviour
         XRotationAmount -= (delta.y * Ysensitivity);
         //same, but for the rotation around the x-axis and moves the camera up and down
         this.transform.parent.transform.rotation = Quaternion.Euler(0, YRotationAmount, 0);
-        this.transform.rotation = Quaternion.Euler(XRotationAmount, 0, 0);
+        this.transform.localRotation = Quaternion.Euler(XRotationAmount, 0, 0);
     }
 }
