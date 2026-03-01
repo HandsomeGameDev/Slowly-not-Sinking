@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public GameObject CameraGO;
     public Rigidbody rb;
-    public float Speed = 5f;
+    public float Speed = 5.0f;
     public Vector2 PlayerInput;
     public InputSystemActions controls;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 PlayerForwardMovement = CameraGO.transform.forward * PlayerInput.y * Speed;
         Vector3 PlayerHorizontalMovement = CameraGO.transform.right * PlayerInput.x * Speed;
-        rb.linearVelocity = PlayerHorizontalMovement + PlayerForwardMovement;
+        Vector3 PlayerMovement = PlayerForwardMovement + PlayerHorizontalMovement;
+        rb.linearVelocity = new Vector3(PlayerMovement.x, rb.linearVelocity.y, PlayerMovement.z);
     }
 }
