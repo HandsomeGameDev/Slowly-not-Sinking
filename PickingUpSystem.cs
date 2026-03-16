@@ -3,22 +3,23 @@ using UnityEngine.InputSystem;
 
 public class PickingUpSystem : MonoBehaviour
 {
-    public InputSystemActions controls;
-    public VerticalSwimming VSwimming;
-    void Awake(){
-        controls = InputScript.InputSysAc;
-        controls.Player.PickUp.performed += ctx => PickUpMethod(ctx);
+    private InputAction clickAction;
+    private SinkingScript SinkingS;
+    void Awake()
+    {
+        InputScript.InputSysAc.Player.PickUp.performed += ctx => OnPickUp();
     }
 
     void Start(){
-        VSwimming = GetComponent<VerticalSwimming>();
+        SinkingS = GetComponent<SinkingScript>();
     }
-    void PickUpMethod(InputAction.CallbackContext ctx)
+
+    void OnPickUp()
     {
         if(PlayerNearCheck.ToolToPickUp != null)
         {
             Destroy(PlayerNearCheck.ToolToPickUp);
-            VSwimming.heightcap += 24;
+            SinkingS.heightCap += 25;
         }
     }
 }
